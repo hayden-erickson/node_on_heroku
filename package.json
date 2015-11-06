@@ -1,0 +1,28 @@
+{
+  "name": "node_on_heroku",
+  "version": "1.0.0",
+  "description": "leverage heroku config/env variables to access external services",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hayden-erickson/node_on_heroku.git"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "config",
+    "variables"
+  ],
+  "author": "Hayden Erickson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hayden-erickson/node_on_heroku/issues"
+  },
+  "homepage": "https://github.com/hayden-erickson/node_on_heroku#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}

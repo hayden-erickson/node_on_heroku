@@ -17,28 +17,31 @@ var connection = mysql.createConnection(
 	
 app.get( '/', (req, res) => 
 {
-	if( process.env.NODE_ENV != 'production' )
+	connection.connect( (err) => 
 	{
-		connection.connect();
+		if( err )
+		{		
+			res.send( err.stack );
+			return;
+		}
 		
-		connection.query( 'SELECT * FROM tbl_users;', 
-			function( err, rows, fields )
-			{
-				if( err ) 
-				{
-					res.send( err );
-					return;
-				}
-				
-				res.send( rows[0] );
-			}
-		);
-		
-		connection.end();
-		return;
-	}
+		console.log( 'connection to DB successful' );
+	});
 	
-	res.send( process.env.CLEARDB_DATABASE_URL );
+	connection.query( 'SELECT * FROM tbl_users;', 
+		function( err, rows, fields )
+		{
+			if( err ) 
+			{
+				res.send( err );
+				return;
+			}
+			
+			res.send( rows[0] );
+		}
+	);
+	
+	connection.end();
 	
 });
 

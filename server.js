@@ -2,6 +2,8 @@ var express = require( 'express' );
 var mysql = require( 'mysql' );
 var app = express();
 
+// process.env.CLEARDB_DATABASE_URL = 'mysql://b77c30db375262:753745bf@us-cdbr-iron-east-03.cleardb.net/heroku_21257787c1a539d?reconnect=true';
+
 var connection = mysql.createConnection( 
 	process.env.CLEARDB_DATABASE_URL ||
 	{
@@ -15,22 +17,28 @@ var connection = mysql.createConnection(
 	
 app.get( '/', (req, res) => 
 {
-	connection.connect();
-	
-	connection.query( 'SELECT * FROM tbl_users;', 
-		function( err, rows, fields )
-		{
-			if( err ) 
+	if( process.env.NODE_ENV != 'production' )
+	{
+		connection.connect();
+		
+		connection.query( 'SELECT * FROM tbl_users;', 
+			function( err, rows, fields )
 			{
-				res.send( 'error: ' + err );
-				return;
+				if( err ) 
+				{
+					res.send( err );
+					return;
+				}
+				
+				res.send( rows[0] );
 			}
-			
-			res.send( 'rows: ' + JSON.stringify( rows[0] ) );
-		}
-	);
+		);
+		
+		connection.end();
+		return;
+	}
 	
-	connection.end();
+	res.send( process.env.CLEARDB_DATABASE_URL );
 	
 });
 

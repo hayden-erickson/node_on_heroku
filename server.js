@@ -42,6 +42,8 @@ app.get( '/', (req, res) =>
 	
 });
 
-app.listen( 6060, ()=> console.log( 'app is listening on 6060' ) );
+var port = process.env.PORT || 6060;
+
+app.listen( port, ()=> console.log( `app is listening on port ${port}` ) );
 
 

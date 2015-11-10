@@ -15,7 +15,8 @@ var connection = mysql.createConnection(
 
 var migrations = 
 [
-	require( './create_users_table' )
+	require( './create_users_table' ),
+	require( './add_user_to_users' )
 ];
 
 connection.connect( (err) =>

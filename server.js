@@ -25,7 +25,7 @@ app.get( '/', (req, res) =>
 				return;
 			}
 			
-			res.send( rows[0] );
+			res.send( rows );
 		}
 	);
 	

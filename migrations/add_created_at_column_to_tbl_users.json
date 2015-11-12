@@ -1,0 +1,3 @@
+{
+	"sql" : "ALTER TABLE tbl_users ADD COLUMN (created_at DATETIME DEFAULT NOW())"
+}

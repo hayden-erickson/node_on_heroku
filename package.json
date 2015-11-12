@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
-	"migrations" : "node migrations/index.js",
+    "dev": "webpack && nodemon server.js",
+    "migrations": "node migrations/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,8 +26,13 @@
   },
   "homepage": "https://github.com/hayden-erickson/node_on_heroku#readme",
   "dependencies": {
+    "body-parser": "^1.14.1",
+    "css-loader": "^0.22.0",
     "express": "^4.13.3",
     "mysql": "^2.9.0",
-    "nodemon": "^1.8.1"
+    "nodemon": "^1.8.1",
+    "react": "^0.14.2",
+    "react-dom": "^0.14.2",
+    "style-loader": "^0.13.0"
   }
 }

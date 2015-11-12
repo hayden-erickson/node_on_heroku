@@ -1,40 +1,17 @@
 var express = require( 'express' );
-var mysql = require( 'mysql' );
-var app = express();
+var users_router = require( './src/users_router' );
 
-app.get( '/', (req, res) => 
-{	
-	var connection = mysql.createConnection( 
-		process.env.CLEARDB_DATABASE_URL ||
-		{
-			host : 'localhost',
-			port : 3306,
-			user : 'root',
-			database : 'test'
-		}
-	);
-	
-	connection.connect();
-	
-	connection.query( 'SELECT * FROM tbl_users;', 
-		function( err, rows, fields )
-		{
-			if( err ) 
-			{
-				res.send( err );
-				return;
-			}
-			
-			res.send( rows );
-		}
-	);
-	
-	connection.end();
-	
+var app = express();
+app.use( express.static( 'app' ) );
+
+app.get( '/', (req, res) =>
+{
+	res.redirect( 'html' );
 });
+
+// routers
+app.use( '/users', users_router );
 
 var port = process.env.PORT || 6060;
 
 app.listen( port, ()=> console.log( `app is listening on port ${port}` ) );
-
-

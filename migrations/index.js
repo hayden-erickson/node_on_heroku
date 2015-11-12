@@ -2,42 +2,25 @@
 // that you want to use to run migrations on the DB. If you add
 // a new migrations/*.js file you must manually include it here.
 var mysql = require( 'mysql' );
-
-var connection = mysql.createConnection(
-	process.env.CLEARDB_DATABASE_URL ||
-	{
-		host : 'localhost',
-		port : 3306,
-		user : 'root',
-		database : 'test'
-	}
-);
+var database = require( '../utils/database' );
 
 var migrations = 
 [
-	require( './create_users_table' ),
-	require( './add_user_to_users' )
+	//require( './create_users_table' )
+	require( './add_created_at_column_to_tbl_users' )
 ];
 
-connection.connect( (err) =>
-{
-	if( err ) console.log( err.stack );
-});
-
+// loop through each migration file and apply to DB
 for( idx in migrations )
 {
-	connection.query( migrations[idx].sql, handle_migration_error );
-}
-
-function handle_migration_error( err, rows, fields )
-{
-	if( err )
+	database.query( migrations[idx].sql, ( err, rows, fields ) =>
 	{
-		console.log( err );
-		return;
-	}
-	
-	console.log( 'success migration' );
+		if( err )
+		{
+			console.log( err );
+			return;
+		}
+		
+		console.log( 'successful migration' );
+	});
 }
-
-connection.end();

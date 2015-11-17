@@ -31,11 +31,7 @@ var FormInput = React.createClass(
 			scope : "email profile"
 		});
 		
-		var request = new XMLHttpRequest();
-		request.open( "GET", oauth_url );
-		request.send();
-		
-		console.log( oauth_url );
+		window.location = oauth_url;
 	},
 	render : function()
 	{

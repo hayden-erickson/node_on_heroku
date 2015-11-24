@@ -71,104 +71,87 @@
 	};
 
 
-	const hashToToken = ( hash ) => {
+	/*const hashToToken = ( hash ) => {
 		if ( hash.substring( 1 ).length === 0 ) {
 			return;
 		}
-		
+
 		var token = qs.decode( hash.substring( 1 ) );
-		
+
 		if ( token.error ) {
 			console.error( token.error );
 			return;
 		}
 
 		return token;
-	};
+	};*/
 
 	const grabToken = ( e ) => {
 		e.preventDefault();
-		
+
 		var oauthUrl = clientSecret.web.authUri + '?' + qs.encode(
 			{
 				response_type: 'token',
 				client_id: clientSecret.web.clientId,
 				redirect_uri: clientSecret.web.redirectUris[ 0 ],
-				scope: 'email profile'
+				scope: 'email profile',
 			}
 		);
-		
+
 		// console.log( oauthUrl );
 		window.location = oauthUrl;
 	};
 
-	const GetTokenButton = () => (
-		React.createElement("div", {className: "col-md-4"}, 
-			React.createElement("button", {className: "btn btn-default", onClick: grabToken}, "Get My Token From Google")
-		)
-	);
-
-	const TokenBox = ( props ) => (
-		React.createElement("div", {className: "col-md-4"}, 
-			React.createElement("p", null, JSON.stringify( props.token, null, 2), " "), 
-			React.createElement("button", {className:  props.verified ? 'btn btn-success' : 'btn btn-default', onClick: verifyToken( props) }, "Verify Token")
-		)
-	);
-
 	const verifyToken = ( props ) => {
 
-		if ( props.verified ) { 
-			return; 
+		if ( props.verified ) {
+			return;
 		}
-		
+
 		var req = new XMLHttpRequest();
 		req.open( 'GET', clientSecret.verifyTokenUri + '?access_token=' + props.token.accessToken );
-		
+
 		req.onreadystatechange = () => {
 
 			if ( req.readyState !== XMLHttpRequest.DONE ) return;
-			
+
 			if ( req.status === 400 ) {
 				console.error( JSON.parse( req.response ).error_description );
 				return; // set button to red
 			}
-			
+
 			// if ( req.status === 200 ) // set button to green;
-			
+
 			// audience of token must match client id from developers console in google
 			if ( !clientSecret.web.clientId.match( JSON.parse( req.response ).audience ) ) {
 				console.error( 'this token is intended for someone else' );
 				return;
 			}
-			
+
 			console.log( 'success!' );
 			props.setVerified( true );
 		};
-		
+
 		req.send();
-		
+
 		console.log( 'loading...' );
 	};
 
 
 	var Token = React.createClass( {displayName: "Token",
-		getInitialState: () => {
-			return { token: null, verified: false };
-		},
-		setVerified: ( bool ) => {
-			this.setState( { verified: bool } );
-		},
 		render: () => (
 			React.createElement("div", {className: "container"}, 
-				
+
 				React.createElement("div", {className: "row"}, 
 					React.createElement("div", {className: "col-md-12"}, 
 						React.createElement("h1", null, "Get Token")
 					)
 				), 
-			
+
 				React.createElement("div", {className: "row"}, 
-					React.createElement(GetTokenButton, null)
+					React.createElement("div", {className: "col-md-4"}, 
+						React.createElement("button", {className: "btn btn-default", onClick: grabToken}, "Get My Token From Google")
+					)
 				)
 			)
 		),

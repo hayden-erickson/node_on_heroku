@@ -3,4 +3,3 @@ applications:
 - name: hayden-1
   memory: 512M
   random-route: true
-  command: npm start

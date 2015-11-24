@@ -52,104 +52,133 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var qs = __webpack_require__(2);
-	var React = __webpack_require__(5);
-	var ReactDOM = __webpack_require__(162);
-	var client_secret =
-	{
-		web : 
-		{
-			client_id : "238563924363-fgdc0ea3pub9a28otusqqf7sdb17efab.apps.googleusercontent.com",
-			auth_uri : "https://accounts.google.com/o/oauth2/auth",
-			token_uri : "https://accounts.google.com/o/oauth2/token",
-			auth_provider_x509_cert_url : "https://www.googleapis.com/oauth2/v1/certs",
-			client_secret : "o2Z2k3tXBsyZ8c95Vp_nRDfW",
-			redirect_uris :
-			[
-				"https://murmuring-river-7363.herokuapp.com"
-			]	
-		}
+	var qs = __webpack_require__( 2 );
+	var React = __webpack_require__( 5 );
+	var ReactDOM = __webpack_require__( 162 );
+	var clientSecret = {
+		verifyTokenUri: 'https://www.googleapis.com/oauth2/v1/tokeninfo',
+		web: {
+			clientId: '238563924363-fgdc0ea3pub9a28otusqqf7sdb17efab.apps.googleusercontent.com',
+			authUri: 'https://accounts.google.com/o/oauth2/auth',
+			tokenUri: 'https://accounts.google.com/o/oauth2/token',
+			authProviderx509CertUrl: 'https://www.googleapis.com/oauth2/v1/certs',
+			clientSecret: 'o2Z2k3tXBsyZ8c95Vp_nRDfW',
+			redirectUris: [
+				'https://murmuring-river-7363.herokuapp.com',
+				'http://localhost:6060',
+			],
+		},
 	};
 
 
-	var FormInput = React.createClass(
-	{displayName: "FormInput",
-		handleSubmit : function(e)
-		{
-			e.preventDefault();
-			var oauth_url =  client_secret.web.auth_uri +'?'+ qs.encode(
+	const hashToToken = ( hash ) => {
+		if ( hash.substring( 1 ).length === 0 ) {
+			return;
+		}
+		
+		var token = qs.decode( hash.substring( 1 ) );
+		
+		if ( token.error ) {
+			console.error( token.error );
+			return;
+		}
+
+		return token;
+	};
+
+	const grabToken = ( e ) => {
+		e.preventDefault();
+		
+		var oauthUrl = clientSecret.web.authUri + '?' + qs.encode(
 			{
-				response_type : 'token',
-				client_id : client_secret.web.client_id,
-				redirect_uri : client_secret.web.redirect_uris[0],
-				scope : "email profile"
-			});
+				response_type: 'token',
+				client_id: clientSecret.web.clientId,
+				redirect_uri: clientSecret.web.redirectUris[ 0 ],
+				scope: 'email profile'
+			}
+		);
+		
+		// console.log( oauthUrl );
+		window.location = oauthUrl;
+	};
+
+	const GetTokenButton = () => (
+		React.createElement("div", {className: "col-md-4"}, 
+			React.createElement("button", {className: "btn btn-default", onClick: grabToken}, "Get My Token From Google")
+		)
+	);
+
+	const TokenBox = ( props ) => (
+		React.createElement("div", {className: "col-md-4"}, 
+			React.createElement("p", null, JSON.stringify( props.token, null, 2), " "), 
+			React.createElement("button", {className:  props.verified ? 'btn btn-success' : 'btn btn-default', onClick: verifyToken( props) }, "Verify Token")
+		)
+	);
+
+	const verifyToken = ( props ) => {
+
+		if ( props.verified ) { 
+			return; 
+		}
+		
+		var req = new XMLHttpRequest();
+		req.open( 'GET', clientSecret.verifyTokenUri + '?access_token=' + props.token.accessToken );
+		
+		req.onreadystatechange = () => {
+
+			if ( req.readyState !== XMLHttpRequest.DONE ) return;
 			
-			window.location = oauth_url;
-		},
-		render : function()
-		{
-			return (
-				React.createElement("form", {role: "form", className: "form-verticle", onSubmit: this.handleSubmit}, 
-					React.createElement("input", {ref: "email", type: "text", className: "form-control", placeholder: "Enter email"}), React.createElement("br", null), 
-					React.createElement("input", {ref: "password", type: "password", className: "form-control", placeholder: "Enter password"}), React.createElement("br", null), 
-					React.createElement("button", {className: "btn btn-default"}, "Get My Stuff From Google")
-				)
-			);
-		}
-	});
-
-	var TokenBox = React.createClass(
-	{displayName: "TokenBox",
-		render : function()
-		{
-			return (
-				React.createElement("div", {className: "form-group"}, 
-					React.createElement("textarea", {className: "form-control", value: this.props.token}), 
-					React.createElement("button", {className: "btn btn-default", onClick: this.props.reset}, "Reset")
-				)
-			);
-		}
-	});
+			if ( req.status === 400 ) {
+				console.error( JSON.parse( req.response ).error_description );
+				return; // set button to red
+			}
+			
+			// if ( req.status === 200 ) // set button to green;
+			
+			// audience of token must match client id from developers console in google
+			if ( !clientSecret.web.clientId.match( JSON.parse( req.response ).audience ) ) {
+				console.error( 'this token is intended for someone else' );
+				return;
+			}
+			
+			console.log( 'success!' );
+			props.setVerified( true );
+		};
+		
+		req.send();
+		
+		console.log( 'loading...' );
+	};
 
 
-	var Token = React.createClass(
-	{displayName: "Token",
-		getInitialState : function()
-		{
-			return { email : "", password : "", token : null };
+	var Token = React.createClass( {displayName: "Token",
+		getInitialState: () => {
+			return { token: null, verified: false };
 		},
-		emptyToken : function()
-		{
-			this.setState( { token : null } );
+		setVerified: ( bool ) => {
+			this.setState( { verified: bool } );
 		},
-		render : function()
-		{
-			return (
-				React.createElement("div", {className: "container"}, 
-					React.createElement("div", {className: "row"}, 
-						React.createElement("div", {className: "col-md-12"}, 
-							React.createElement("h1", null,  this.state.token ? "Got Your Token" : "Get Token")
-						)
-					), 
-					React.createElement("div", {className: "row"}, 
-						React.createElement("div", {className: "col-md-4"}, 
-						 
-							this.state.token ? 
-								React.createElement(TokenBox, {token: this.state.token, reset: this.emptyToken}) : 
-								React.createElement(FormInput, null)
-						
-						)
+		render: () => (
+			React.createElement("div", {className: "container"}, 
+				
+				React.createElement("div", {className: "row"}, 
+					React.createElement("div", {className: "col-md-12"}, 
+						React.createElement("h1", null, "Get Token")
 					)
+				), 
+			
+				React.createElement("div", {className: "row"}, 
+					React.createElement(GetTokenButton, null)
 				)
-			);
-		}
-	});
+			)
+		),
+	} );
 
 	ReactDOM.render(
 		React.createElement(Token, null),
 		document.getElementById( 'content' )
-	)
+	);
+
 
 /***/ },
 /* 2 */

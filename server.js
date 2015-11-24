@@ -1,11 +1,11 @@
 var express = require( 'express' );
-var users_router = require( './src/users_router' );
+var usersRouter = require( './src/users_router' );
 
 var app = express();
-app.use( express.static('app') );
+app.use( express.static( 'app' ) );
 
 // routers
-app.use(  '/users', users_router );
+app.use( '/users', usersRouter );
 
 var port = process.env.PORT || 6060;
 
